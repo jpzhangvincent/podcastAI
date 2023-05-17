@@ -1,0 +1,6 @@
+langchain
+langchain-serve
+tiktoken
+openai
+loguru
+youtube-transcript-api
