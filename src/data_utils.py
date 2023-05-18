@@ -14,8 +14,8 @@ def get_youtube_transcript(video_id):
     subtitles disabled: https://www.youtube.com/watch?v=BMiNoO1DlD8
     """
     transcript = YouTubeTranscriptApi.get_transcript(video_id)
-    cleaned_transcript = ' '. join([t['text'] for t in transcript]).lower().replace('>>', '')
-    return cleaned_transcript
+    #cleaned_transcript = ' '. join([t['text'] for t in transcript]).lower().replace('>>', '')
+    return transcript
 
 
 def get_video_ids_from_collection_list(playlist_id):
