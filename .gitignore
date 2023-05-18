@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.cpython-39.pyc
-
+src/__pycache__/*.cpython-39.pyc
 # C extensions
 *.so
 

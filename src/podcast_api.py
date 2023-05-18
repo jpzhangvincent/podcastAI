@@ -8,9 +8,10 @@ from typing import Dict
 
 allin_youtube_episodes_df = read_data_pickle('../data/allin_youtube_episodes_df.pkl')
 allin_faiss_index = read_data_pickle('../data/allin_faiss_index.pkl')
-
-
-cache = read_data_pickle("../data/summary_cache.pkl")
+try:
+    cache = read_data_pickle("../data/summary_cache.pkl")
+except:
+    cache = {}
 
 @serving
 def get_summarized_topics(videoid:str, **kwargs) -> str:
@@ -34,7 +35,7 @@ def get_qa_search(querytext:str, **kwargs) -> Dict:
     answer = get_qa_with_sources(querytext, allin_faiss_index)
     return answer
 
-
+@serving
 def get_context_search(timestamp: float, videoid:str,  **kwargs) -> Dict:
     answer = get_in_context_search(timestamp, videoid, allin_youtube_episodes_df, allin_faiss_index)
     return answer
