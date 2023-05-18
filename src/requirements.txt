@@ -1,5 +1,5 @@
-langchain
-langchain-serve
+langchain=='0.0.168'
+langchain-serve=='0.0.32'
 tiktoken
 openai
 loguru
