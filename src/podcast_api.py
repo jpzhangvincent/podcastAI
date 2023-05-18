@@ -17,6 +17,8 @@ from typing import Dict
 # vectorstore = get_vectorstore()
 
 allin_youtube_episodes_df = read_data_pickle('../data/allin_youtube_episodes_df.pkl')
+allin_faiss_index = read_data_pickle('../data/allin_faiss_index.pkl')
+
 
 @serving
 def get_summarized_topics(videoid:str, **kwargs) -> str:
@@ -35,5 +37,13 @@ def get_summarized_topics(videoid:str, **kwargs) -> str:
         return ''
     
 
-# @serving
-# def get_summarized_topics(videoid:str, **kwargs) -> Dict:
+@serving
+def get_qa_search(querytext:str, **kwargs) -> Dict:
+    openai_api_key = os.environ['OPENAI_API_KEY']
+    llm = ChatOpenAI(
+        openai_api_key=openai_api_key,
+        temperature=0,
+        model_name='gpt-3.5-turbo',
+    )
+    answer = get_qa_with_sources(querytext, llm, allin_faiss_index)
+    return answer 

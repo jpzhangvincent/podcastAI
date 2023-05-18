@@ -5,7 +5,8 @@ from langchain.prompts import PromptTemplate
 import tiktoken
 from langchain.docstore.document import Document
 from prompts import MAP_PROMPT, COMBINE_PROMPT
-
+from langchain.chains.qa_with_sources import load_qa_with_sources_chain
+from langchain.chains import RetrievalQAWithSourcesChain
 
 tokenizer = tiktoken.get_encoding('cl100k_base')
 def tiktoken_len(text: str) -> int:
@@ -30,3 +31,13 @@ def get_summary(llm, transcript_txt):
     topic_summary = chain({"input_documents": docs}, return_only_outputs=True)
     topic_summary_txt = topic_summary['output_text'].strip()
     return topic_summary_txt
+
+def get_qa_with_sources(question, llm, faiss_index):
+    qa_chain = load_qa_with_sources_chain(llm, chain_type="stuff")
+    qa = RetrievalQAWithSourcesChain(combine_documents_chain=qa_chain, 
+                                 retriever=faiss_index.as_retriever(),
+                                 return_source_documents = True)
+
+    answer = qa({"question": question}, return_only_outputs=True)
+    return answer
+    
