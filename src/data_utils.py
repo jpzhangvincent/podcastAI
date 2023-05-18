@@ -93,6 +93,33 @@ def get_all_episode_transcripts_by_playlist(playlist_id):
     all_episodes_df = pd.DataFrame.from_records(all_episodes_ls)
     return all_episodes_df
     
+def group_segments(segments, segment_max_length=600):
+    grouped_segments = []
+    for segment in segments:
+        if len(grouped_segments) == 0:
+            # add an end time
+            # youtube transcript api doesn't return end times (start, duration)
+            end_time = segment.get("start") + segment.get("duration")
+            segment["end_time"] = end_time
+            grouped_segments.append(segment)
+        else:
+            last_group = grouped_segments[-1]
+            last_group_text = last_group.get("text")
+            current_group_text = segment.get("text")
+            combined_text = f"{last_group_text} {current_group_text}"
+            if len(combined_text) <= segment_max_length:
+                # add an end time
+                # youtube transcript api doesn't return end times (start, duration)
+                end_time = segment.get("start") + segment.get("duration")
+                grouped_segments[-1]["end_time"] = end_time
+                grouped_segments[-1]["text"] = combined_text
+            else:
+                # add an end time
+                # youtube transcript api doesn't return end times (start, duration)
+                end_time = segment.get("start") + segment.get("duration")
+                segment["end_time"] = end_time
+                grouped_segments.append(segment)
+    return grouped_segments
 
 # get the list of videoids from the All-in podcast playlist
 # collection_list_id = "PLn5MTSAqaf8peDZQ57QkJBzewJU1aUokl"  # Replace with your collection list ID
