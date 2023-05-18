@@ -1,21 +1,29 @@
 import os
 import pandas as pd
+import pickle
 from youtube_transcript_api import YouTubeTranscriptApi
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+
 def get_authenticated_service():
-    api_key = os.getenv('GOOGLE_API_KEY')  # Replace with your API key
+    api_key = os.getenv("GOOGLE_API_KEY")  # Replace with your API key
     return build("youtube", "v3", developerKey=api_key)
 
-def get_youtube_transcript(video_id):
+
+def get_youtube_transcript(video_id, postprocess=True):
     """
     Examples:
     subtitles disabled: https://www.youtube.com/watch?v=BMiNoO1DlD8
     """
     transcript = YouTubeTranscriptApi.get_transcript(video_id)
-    #cleaned_transcript = ' '. join([t['text'] for t in transcript]).lower().replace('>>', '')
-    return transcript
+    if postprocess:
+        cleaned_transcript = (
+            " ".join([t["text"] for t in transcript]).lower().replace(">>", "")
+        )
+        return cleaned_transcript
+    else:
+        return transcript
 
 
 def get_video_ids_from_collection_list(playlist_id):
@@ -26,12 +34,16 @@ def get_video_ids_from_collection_list(playlist_id):
 
         while True:
             # Call the API to retrieve videos from the collection list
-            response = youtube.playlistItems().list(
-                part="contentDetails",
-                playlistId=playlist_id,
-                maxResults=50,
-                pageToken=next_page_token
-            ).execute()
+            response = (
+                youtube.playlistItems()
+                .list(
+                    part="contentDetails",
+                    playlistId=playlist_id,
+                    maxResults=50,
+                    pageToken=next_page_token,
+                )
+                .execute()
+            )
 
             # Extract video IDs from the API response
             for item in response["items"]:
@@ -56,10 +68,7 @@ def get_video_metadata(video_id):
         youtube = get_authenticated_service()
 
         # Call the API to retrieve video details
-        response = youtube.videos().list(
-            part="snippet",
-            id=video_id
-        ).execute()
+        response = youtube.videos().list(part="snippet", id=video_id).execute()
 
         # Extract the metadata from the API response
         video_details = {
@@ -68,7 +77,7 @@ def get_video_metadata(video_id):
             "channelName": response["items"][0]["snippet"]["channelTitle"],
             "description": response["items"][0]["snippet"]["description"],
             "episodeTitle": response["items"][0]["snippet"]["title"],
-            "tags": response["items"][0]["snippet"].get("tags")
+            "tags": response["items"][0]["snippet"].get("tags"),
         }
         return video_details
 
@@ -85,14 +94,17 @@ def get_all_episode_transcripts_by_playlist(playlist_id):
     for video_id in video_ids:
         try:
             video_detail_dict = get_video_metadata(video_id)
-            video_detail_dict['transcription'] = get_youtube_transcript(video_id)
+            video_detail_dict["transcription"] = get_youtube_transcript(
+                video_id, postprocess=False
+            )
             all_episodes_ls.append(video_detail_dict)
         except:
             continue
 
     all_episodes_df = pd.DataFrame.from_records(all_episodes_ls)
     return all_episodes_df
-    
+
+
 def group_segments(segments, segment_max_length=600):
     grouped_segments = []
     for segment in segments:
@@ -120,6 +132,13 @@ def group_segments(segments, segment_max_length=600):
                 segment["end_time"] = end_time
                 grouped_segments.append(segment)
     return grouped_segments
+
+
+def read_data_pickle(filepath):
+    with open(filepath, "rb") as f:
+        obj = pickle.load(f)
+    return obj
+
 
 # get the list of videoids from the All-in podcast playlist
 # collection_list_id = "PLn5MTSAqaf8peDZQ57QkJBzewJU1aUokl"  # Replace with your collection list ID
