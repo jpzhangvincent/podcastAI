@@ -28,5 +28,5 @@ def get_summary(llm, transcript_txt):
     chain = load_summarize_chain(llm, chain_type="map_reduce", return_intermediate_steps=False, 
                                 map_prompt=MAP_PROMPT, combine_prompt=COMBINE_PROMPT)
     topic_summary = chain({"input_documents": docs}, return_only_outputs=True)
-    topic_summary_txt = json.loads(json.dumps(topic_summary))['output_text'].strip()
+    topic_summary_txt = topic_summary['output_text'].strip()
     return topic_summary_txt

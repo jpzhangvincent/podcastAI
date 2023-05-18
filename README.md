@@ -1,4 +1,4 @@
-# podcastAI
+# Podcast.ai
 Hackaithon Project
 
 # Backend API setup

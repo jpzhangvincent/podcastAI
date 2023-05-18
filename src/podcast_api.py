@@ -3,7 +3,7 @@ import pickle
 import json 
 from loguru import logger
 from lcserve import serving
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain_utils import get_summary
 from data_utils import get_youtube_transcript
 
@@ -18,7 +18,7 @@ from data_utils import get_youtube_transcript
 @serving
 def get_summarized_topics(videoid:str, **kwargs) -> str:
     openai_api_key = os.environ['OPENAI_API_KEY']
-    llm = OpenAI(
+    llm = ChatOpenAI(
         openai_api_key=openai_api_key,
         temperature=0,
         model_name='gpt-3.5-turbo',
