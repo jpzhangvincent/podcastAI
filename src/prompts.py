@@ -29,3 +29,12 @@ Please output in the following json format without the `output_text` key and nes
 summary:
 """
 COMBINE_PROMPT = PromptTemplate(template=combine_prompt_template, input_variables=["text"])
+
+
+paraphrase_template = """You are an expert youtube podcast editor. Please paraphrase and summarize the context
+in a question format for semantic search later. You will only paraphrase and summarize when the speakers are talking 
+about a specific subject. Return empty string if they are just chitchatting.
+
+Context: {context}
+Question: """
+PARAPHRASE_PROMPT = PromptTemplate(input_variables=["context"], template=paraphrase_template)

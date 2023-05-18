@@ -5,3 +5,5 @@ openai
 loguru
 youtube-transcript-api
 google-api-python-client
+datasets
+faiss-cpu
