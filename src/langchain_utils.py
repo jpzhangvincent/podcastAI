@@ -18,7 +18,7 @@ def tiktoken_len(text: str) -> int:
     )
     return len(tokens)
 
-def get_summary(llm, transcript_txt):
+def get_summary(transcript_txt):
     text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000,
             chunk_overlap=200,  # number of tokens overlap between chunks
@@ -65,7 +65,7 @@ def get_in_context_search(timestamp, videoid, allin_youtube_episodes_df, faiss_i
     # This is an LLMChain to write a synopsis given a title of a play and the era it is set in.
     llm = ChatOpenAI(openai_api_key=openai_api_key, temperature=0.2)
    
-    context_paraphrase_chain = LLMChain(llm=llm, prompt=prompt_template, output_key="question")
+    context_paraphrase_chain = LLMChain(llm=llm, prompt=PARAPHRASE_PROMPT, output_key="question")
 
     # This is an LLMChain to do the semantic search
     qa_chain = load_qa_with_sources_chain(llm, chain_type="stuff")
