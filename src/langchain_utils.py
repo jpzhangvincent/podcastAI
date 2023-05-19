@@ -8,7 +8,7 @@ from langchain.docstore.document import Document
 from prompts import MAP_PROMPT, COMBINE_PROMPT, PARAPHRASE_PROMPT
 from langchain.chains import SequentialChain
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
-from langchain.chains import LLMChain, LLMCheckerChain, RetrievalQAWithSourcesChain
+from langchain.chains import LLMChain, LLMCheckerChain, RetrievalQAWithSourcesChain, LLMSummarizationCheckerChain
 
 tokenizer = tiktoken.get_encoding('cl100k_base')
 def tiktoken_len(text: str) -> int:
@@ -58,9 +58,9 @@ def get_qa_with_sources(question, faiss_index):
 
 
 def get_in_context_search(timestamp, videoid, allin_youtube_episodes_df, faiss_index):
-    in_context_text = allin_youtube_episodes_df[(allin_youtube_episodes_df.id.str.startswith(timestamp)) &\
-                  (videoid > allin_youtube_episodes_df.start) &\
-                  (videoid < allin_youtube_episodes_df.end_time)].text.values[0]
+    in_context_text = allin_youtube_episodes_df[(allin_youtube_episodes_df.id.str.startswith(videoid)) &\
+                  (timestamp > allin_youtube_episodes_df['start']) &\
+                  (timestamp < allin_youtube_episodes_df['end_time'])].text.values[0]
     openai_api_key = os.environ['OPENAI_API_KEY']
     # This is an LLMChain to write a synopsis given a title of a play and the era it is set in.
     llm = ChatOpenAI(openai_api_key=openai_api_key, temperature=0.2)
@@ -83,4 +83,12 @@ def get_in_context_search(timestamp, videoid, allin_youtube_episodes_df, faiss_i
     )
     result = in_context_search_chain({"context": in_context_text})
     return result
+
+def get_fact_check(query):
+    openai_api_key = os.environ['OPENAI_API_KEY']
+    llm = ChatOpenAI(openai_api_key=openai_api_key, temperature=0)
+    checker_chain = LLMSummarizationCheckerChain.from_llm(llm, max_checks=2, verbose=True)
+    print(checker_chain)
+    check_output = checker_chain.run(query)
+    return check_output
         
