@@ -84,11 +84,10 @@ def get_in_context_search(timestamp, videoid, allin_youtube_episodes_df, faiss_i
     result = in_context_search_chain({"context": in_context_text})
     return result
 
-def get_fact_check(query):
+def get_summarized_fact_check(query):
     openai_api_key = os.environ['OPENAI_API_KEY']
     llm = ChatOpenAI(openai_api_key=openai_api_key, temperature=0)
     checker_chain = LLMSummarizationCheckerChain.from_llm(llm, max_checks=2, verbose=True)
-    print(checker_chain)
     check_output = checker_chain.run(query)
     return check_output
         

@@ -6,10 +6,11 @@ from langchain_utils import (
     get_summary,
     get_qa_with_sources,
     get_in_context_search,
-    get_fact_check,
+    get_summarized_fact_check,
 )
 from data_utils import get_youtube_transcript, read_data_pickle
 from typing import Dict, Union
+
 
 allin_youtube_episodes_df = read_data_pickle("../data/allin_youtube_episodes_df.pkl")
 logger.info(f"allin_youtube_episodes_df: {allin_youtube_episodes_df.columns}...")
@@ -53,6 +54,5 @@ def get_context_search(timestamp: Union[float, int], videoid: str, **kwargs) -> 
 
 @serving
 def get_fact_check(query: str, **kwargs) -> str:
-    logger.info("Query:", query)
-    answer = get_fact_check(query)
+    answer = get_summarized_fact_check(query)
     return answer
