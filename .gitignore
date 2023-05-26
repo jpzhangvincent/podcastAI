@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 *.cpython-39.pyc
 src/__pycache__/*.cpython-39.pyc
+*/*/*/__pycache__/
+*/*/__pycache__/
+*/__pycache__/
 # C extensions
 *.so
 
